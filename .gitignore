@@ -1,0 +1,11 @@
+# مجلد الصور المرفوعة (يجب ألا يُرفع على GitHub)
+src/uploads/
+
+# ملفات النظام
+.env
+.DS_Store
+Thumbs.db
+
+# مجلدات المؤقت
+vendor/
+node_modules/
