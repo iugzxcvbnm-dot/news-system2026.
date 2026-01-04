@@ -1,0 +1,8 @@
+services:
+  news-app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src/uploads:/var/www/html/uploads
+    restart: always
