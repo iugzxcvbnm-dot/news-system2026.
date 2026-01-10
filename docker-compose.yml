@@ -1,31 +1,45 @@
-version: '3.8'
 services:
-  # خدمة التطبيق (PHP + Apache)
+  # خدمة تطبيق الويب (PHP + Apache)
   news-app:
     build: .
+    container_name: news_system_app
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
+      - ./src:/var/www/html
       - ./src/uploads:/var/www/html/uploads
     depends_on:
-      - db  # يعتمد على خدمة db
-    environment:
-      DB_HOST: db       # ← اسم خدمة قاعدة البيانات داخل Docker
-      DB_NAME: newsdb
-      DB_USER: user
-      DB_PASS: securepass123
+      db:
+        condition: service_healthy # ينتظر حتى تتأكد قاعدة البيانات من جاهزيتها تماماً
+    networks:
+      - news-network
 
   # خدمة قاعدة البيانات (MySQL)
   db:
     image: mysql:8.0
+    container_name: news_system_db
     restart: always
     environment:
       MYSQL_DATABASE: newsdb
       MYSQL_USER: user
-      MYSQL_PASSWORD: securepass123
-      MYSQL_ROOT_PASSWORD: rootsecure456
+      MYSQL_PASSWORD: password123
+      MYSQL_ROOT_PASSWORD: root123
     volumes:
-      - mysql_data:/var/lib/mysql  # لحفظ البيانات
+      - mysql_data:/var/lib/mysql
+      - ./init-db:/docker-entrypoint-initdb.d # المجلد الذي يحتوي على كود إنشاء الجداول
+    healthcheck: # فحص للتأكد من أن MySQL تعمل فعلاً قبل تشغيل التطبيق
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot123"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - news-network
 
+# تعريف الشبكة الداخلية لتواصل الحاويات
+networks:
+  news-network:
+    driver: bridge
+
+# تعريف مكان تخزين بيانات قاعدة البيانات بشكل دائم
 volumes:
-  mysql_data:  # مجلد دائم لبيانات MySQL
+  mysql_data:

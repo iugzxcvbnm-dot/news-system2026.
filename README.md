@@ -33,7 +33,7 @@ Follow these steps to run the project in under 2 minutes:
 
     5.Access the application:
    Open your browser and go to:
-   http://localhost:80
+   http://localhost:8080
    
    6.How to Test the Project:
 

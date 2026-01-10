@@ -1,22 +1,20 @@
 <?php
-/**
- * اتصال آمن بقاعدة البيانات باستخدام PDO
- * متوافق مع Docker (يستخدم خدمة 'db' الداخلية)
- */
-
-// منع الوصول المباشر لهذا الملف
+// منع الوصول المباشر
 if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
     die('Direct access not allowed.');
 }
 
-try {
-    // قراءة إعدادات الاتصال من متغيرات البيئة (محددة في docker-compose.yml)
-    $host = getenv('DB_HOST') ?: 'db';           // اسم خدمة MySQL في Docker
-    $dbname = getenv('DB_NAME') ?: 'newsdb';     // اسم قاعدة البيانات
-    $user = getenv('DB_USER') ?: 'user';         // اسم المستخدم
-    $pass = getenv('DB_PASS') ?: 'securepass123'; // كلمة المرور
+// بدء الجلسة إذا لم تكن مفعلة
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-    // إنشاء اتصال PDO
+try {
+    $host = 'db'; // يجب أن يطابق اسم الخدمة في docker-compose
+    $dbname = 'newsdb';
+    $user = 'user';
+    $pass = 'password123';
+
     $pdo = new PDO(
         "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
         $user,
@@ -27,16 +25,18 @@ try {
             PDO::ATTR_EMULATE_PREPARES => false,
         ]
     );
-
+    
 } catch (PDOException $e) {
-    // سجّل الخطأ في السجل (للمراجعة لاحقًا)
-    error_log("Database connection failed: " . $e->getMessage());
-
-    // عطّل الصفحة ووجّه المستخدم لصفحة خطأ
-    header("HTTP/1.1 500 Internal Server Error");
-    header("Location: /error.php");
-    exit();
+    // تسجيل الخطأ داخلياً وعرض رسالة بسيطة للمستخدم
+    error_log("Connection Error: " . $e->getMessage());
+    die("عذرًا، لا يمكن الاتصال بقاعدة البيانات.");
 }
-?>
 
+// دالة التحقق من تسجيل الدخول (مطلوبة في dashboard.php وغيرها)
+function check_login() {
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit;
+    }
+}
 
