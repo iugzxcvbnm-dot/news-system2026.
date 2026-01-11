@@ -43,3 +43,22 @@ Enter valid credentials stored in the database
 
 Successful login confirms database connectivity and application functionality
 
+
+Deployment Steps:
+1-Open the repository in GitHub Codespaces
+2-Verify Git and Docker are installed:
+git --version
+docker --version
+3-If Docker is not installed, install it:
+sudo apt update && sudo apt install -y docker.io docker-compose
+sudo usermod -aG docker $USER && newgrp docker
+4-Clone the repository (if not auto-cloned):
+git clone https://github.com/iugzxcvbnm-dot/news-system2026..git
+cd news-system2026.
+5-docker-compose up -d --build
+6-docker-compose ps
+7-Access the app via the Ports panel in Codespaces
+https://refactored-space-rotary-phone-5g74x4prwqprfv66w-8080.app.github.dev/
+
+
+
